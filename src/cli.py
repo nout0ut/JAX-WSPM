@@ -22,11 +22,14 @@ from config.settings import (
 )
 from src.solvers.richards_solver import RichardsSolver
 from src.solvers.coupled_solver_v2 import CoupledSolver
+from src.solvers.richards_solver_3D_v2 import RichardsSolver3D
+
 from src.utils.plotting import ResultsVisualizer 
 from src.utils.performance import print_simulation_summary
 from src.utils.results_handler import save_simulation_results
 from src.utils.error_calculation import calculate_final_errors 
 from src.utils.exact_solutions import exact_solution
+
 
 from config.welcome_banner import (
     print_welcome_banner, 
@@ -34,12 +37,14 @@ from config.welcome_banner import (
 )
 
 # At the top of your file, after imports
-#jax.config.update('jax_debug_nans', True)
-jax.config.update('jax_enable_x64', True)
-#jax.config.update('jax_debug_infs', True)
 
-from jax import profiler
+jax.config.update('jax_enable_x64', False)
+# jax.config.update('jax_disable_jit', True)
 
+
+
+
+# src/cli.py modifications
 
 def parse_args():
     """Parse command line arguments."""
@@ -49,29 +54,26 @@ def parse_args():
     )
     
     # Mesh options
-    parser.add_argument('--mesh-size', choices=['25', '50', '100', '200', '1024', '2048', '4096', '8192', '16384', '65536', '267039', '1014454'],
+    parser.add_argument('--mesh-size', choices=['25', '50', '100', '200', '1024', '2048', '4096', 
+                                              '8192', '16384', '65536', '267039', '1014454'],
                        default='25', help='Mesh resolution')
     
     # Test case selection
     parser.add_argument('--test-case', 
-                       choices=['Test1', 'Test2', 'Test3', 'SoluteTest'],
+                       choices=['Test1', 'Test2', 'Test3', 'Test3D', 'SoluteTest'],  # Added Test3D
                        default='Test1', 
                        help='Test case to simulate')
     
-    # Solver options
+    # Rest of the parser arguments remain the same...
     parser.add_argument('--solver', choices=['gmres', 'cg', 'bicgstab', 'direct'],
                        default='gmres', help='Linear solver type')
     parser.add_argument('--preconditioner',
                        choices=['none', 'jacobi', 'ilu', 'block_jacobi', 'ssor'],
                        default='none', help='Preconditioner type')
-    
-    # Time stepping options
     parser.add_argument('--dt', type=float, default=1e-6,
                        help='Initial time step size')
     parser.add_argument('--tmax', type=float, default=1.0,
                        help='Maximum simulation time')
-    
-    # Output options
     parser.add_argument('--output-dir', type=str, default='results',
                        help='Directory for output files')
     parser.add_argument('--save-frequency', type=int, default=5,
@@ -79,17 +81,10 @@ def parse_args():
     
     return parser.parse_args()
 
-
-
 def main():
     init()  # Initialize colorama
-    #print_welcome_banner()
     print_fancy_banner()
     
-    # jax.print_environment_info()
-    # devices = jax.devices()
-    # num_devices = jax.device_count()
-
     # Parse command line arguments
     args = parse_args()
     
@@ -121,6 +116,7 @@ def main():
     )
     
     config.mesh.mesh_size = args.mesh_size
+    
     # Save configuration
     config_file = output_dir / 'simulation_config.json'
     with open(config_file, 'w') as f:
@@ -134,58 +130,64 @@ def main():
         # Choose appropriate solver based on test case
         if args.test_case == 'SoluteTest':
             solver = CoupledSolver(config)
-            
+        elif args.test_case == 'Test3D':
+            solver = RichardsSolver3D(config)
         else:
-            # solver = RichardsSolver(config)
             solver = RichardsSolver(config)
         
         # Run simulation
-        
         results = solver.solve()
         
-        # Calculate errors for Test1, Test2, Test3
-        if args.test_case != 'SoluteTest':
+        # Calculate errors for Test1, Test2, Test3 (not for 3D)
+        if args.test_case not in ['SoluteTest', 'Test3D']:
             error_metrics = calculate_final_errors(results, config)
             results.update(error_metrics)
         
+        # Save numerical results
+        results_file = output_dir / f'numerical_results_{args.test_case}_{args.solver}_{args.solver}_{args.preconditioner}_mesh{args.mesh_size}.npz'
         
-        # Save numerical results for the RE
-        results_file = output_dir / f'numerical_results_cpu_{args.test_case}_{args.solver}_ {args.dt}.npz'  #_{args.solver}_{args.preconditioner}_mesh{args.mesh_size}
+        # Save results with appropriate handling for 3D case
+        save_dict = {
+            'pressure_head': results['pressure_head'],
+            'theta': results.get('theta', None),
+            'solute': results.get('solute', None),
+            'times': results['times'],
+            'points': results['points'],
+            'elements': results['triangles'] if args.test_case != 'Test3D' else results['tetrahedra'],
+            'iterations': results['iterations'],
+            'errors': results['errors'],
+            'dt_values': results['dt_values'],
+            'simulation_time': results['simulation_time'],
+            'memory_usage': float(psutil.Process().memory_info().rss / (1024 * 1024))
+        }
         
-        jnp.savez(results_file,
-             pressure_head=results['pressure_head'],
-             theta=results.get('theta', None),
-             solute=results.get('solute', None),
-             times=results['times'],
-             points=results['points'],
-             triangles=results['triangles'],
-             iterations=results['iterations'],
-             errors=results['errors'],
-             dt_values=results['dt_values'],
-             l2_pressure=float(results.get('l2_pressure', 0)),
-             linf_pressure=float(results.get('linf_pressure', 0)),
-             l2_saturation=float(results.get('l2_saturation', 0)),
-             linf_saturation=float(results.get('linf_saturation', 0)),
-             l2_relative_pressure=float(results.get('l2_relative_pressure', 0)),
-             l2_relative_saturation=float(results.get('l2_relative_saturation', 0)),
-             simulation_time=results['simulation_time'],
-             memory_usage=float(psutil.Process().memory_info().rss / (1024 * 1024)))  # Memory in MB
+        # Add error metrics if they exist
+        if args.test_case not in ['SoluteTest', 'Test3D']:
+            save_dict.update({
+                'l2_pressure': float(results.get('l2_pressure', 0)),
+                'linf_pressure': float(results.get('linf_pressure', 0)),
+                'l2_saturation': float(results.get('l2_saturation', 0)),
+                'linf_saturation': float(results.get('linf_saturation', 0)),
+                'l2_relative_pressure': float(results.get('l2_relative_pressure', 0)),
+                'l2_relative_saturation': float(results.get('l2_relative_saturation', 0))
+            })
+        
+        jnp.savez(results_file, **save_dict)
 
-        # Create and save visualizations 
-        
+        # Create and save visualizations
+        visualizer = ResultsVisualizer(output_dir)
         if args.test_case == 'SoluteTest':
-            visualizer = ResultsVisualizer(output_dir)
-            visualizer.plot_final_state(
-                results['points'],  # ? Pass mesh points
-                results['triangles'],  # ? Pass triangle indices
-                results['final_theta'],  
-                results['final_solute'],  
-                # results['final_pressure'], 
+            visualizer.plot_final_state(   
+                results['points'],
+                results['triangles'],
+                results['final_theta'],
+                results['final_solute'],
                 output_dir / 'final_state.png'
             )
-
+        # elif args.test_case == 'Test3D':
+        #     # Use 3D visualization if implemented
+        #     visualizer.plot_3d_results(results)  
         else:
-            visualizer = ResultsVisualizer(output_dir)
             visualizer.plot_all_results(results)
         
         print(f"\n{Fore.GREEN}Results saved successfully:{Style.RESET_ALL}")
@@ -201,7 +203,7 @@ def main():
         print(f"{str(e)}")
         raise
 
-        
 if __name__ == "__main__":
     main()
-    
+
+
