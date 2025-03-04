@@ -12,6 +12,20 @@ JAX-WSPM: A GPU-accelerated parallel framework using the JAX library for modelin
 ### Abstract
 > Accurate simulation of water flow and solute transport in unsaturated porous media demands solving complex, highly nonlinear partial differential equations. Traditional implicit finite element methods are robust but can be computationally expensive when addressing the coupled dynamics of water fluxes and solute migration. In this work, we introduce JAX-WSPM, an open-source framework that leverages GPU acceleration, just-in-time (JIT) compilation, and automatic differentiation (AD) via the JAX library to efficiently solve the Richards equation and its associated transport equations. JAX-WSPM implements two complementary strategies for computing water fluxes—one using conventional finite element formulations and another that supports automatic differentiation—and it incorporates an adaptive time-stepping scheme to dynamically optimize simulation performance. Benchmark results show that our GPU-based implementation dramatically reduces total simulation times, achieving speedups of approximately 25× relative to adaptive serial runs and up to 49× relative to non-adaptive serial implementations. JAX-WSPM is available at [https://github.com/nout0ut/JAX-WSPM](https://github.com/nout0ut/JAX-WSPM), and we believe that a Python package such as JAX-WSPM is crucial to facilitating cutting-edge research in hydrodynamics by enabling rapid prototyping and scalable, high-fidelity simulations.
 
+## Authors and Contact
+
+**Authors:**
+
+- Nour-eddine Toutlini  
+- Azzeddine Soulaïmani  
+- Abdelaziz Beljadid  
+
+**Contact Information:**
+
+- Email: [noureddine.toutlini@um6p.ma](mailto:noureddine.toutlini@um6p.ma)
+- Email: [nour-eddine.toutlini.1@ens.etsmtl.ca](mailto:nour-eddine.toutlini.1@ens.etsmtl.ca)
+
+
 ### Citation
 ```bibtex
 @article{toutlini2025JAX_WSPM,
