@@ -27,10 +27,6 @@ from ..numerics.assembly_solute import assemble_global_matrices_solute
 from ..mesh.loader import load_and_validate_mesh
 # from .jax_linear_solver import JAXSparseSolver
 
-
-# def track_memory(location):
-#     process = psutil.Process()
-#     print(f"Memory usage at {location}: {process.memory_info().rss / 1024 / 1024} MB")
     
 def track_memory(message):
     """Track memory usage at specific points."""

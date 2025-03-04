@@ -57,7 +57,6 @@ class RichardsSolver:
         )
         
         # Get boundary nodes
-        #self.top_nodes, self.bottom_nodes = extract_boundary_nodes(self.points, self.config.test_case)
         self.boundary_nodes = extract_boundary_nodes(self.points, self.config.test_case)
         
         
@@ -115,23 +114,17 @@ class RichardsSolver:
             Capacity_m, Konduc_m, thetan_m = vmap(exponential_model, in_axes=(0, None))(
                 pressure_head_m, self.config.exponential.to_array())
             
-            # track_memory("Before Richards assembly")
             # Assemble matrices
             Global_matrix, Global_source = assemble_global_matrices_sparse_re(
                 self.triangles, self.nnt, self.points,
                 thetan_m, thetan_0, pressure_head_m,
                 Konduc_m, Capacity_m, self.quad_points, self.weights, dt
             )
-            # track_memory("After Richards assembly")
                      
-            # track_memory("Before matrix_dense")
             matrix_dense = Global_matrix.todense()
-            # track_memory("Afetr matrix_dense")
             
-            # track_memory("Before BCs")
             if self.bc_info['type'] == 'richards_only':
                 # Apply top boundary condition
-                #print("Apply top boundary condition")
                 matrix_dense, Global_source = apply_dirichlet_bcs(
                     matrix_dense,
                     Global_source,
@@ -147,13 +140,10 @@ class RichardsSolver:
                     self.boundary_nodes.bottom,
                     jnp.full_like(self.boundary_nodes.bottom, -15.24)
                 )
-            # track_memory("After BCs")
             
             # Calculate matrix sum with explicit nse
             total_entries = self.triangles.shape[0] * 9
             Global_matrix = BCOO.fromdense(matrix_dense, nse=total_entries)
-            # pressure_head = jnp.linalg.solve(matrix_dense, Global_source)
-            # track_memory("After BCOO")
             
             pressure_head, convergence = solve_system(
                 matrix=Global_matrix,
@@ -161,12 +151,9 @@ class RichardsSolver:
                 x0=pressure_head_m,
                 solver_config=self.config.solver
             )
-            # track_memory("After linear system")
 
             err = jnp.linalg.norm(pressure_head - pressure_head_m) / jnp.linalg.norm(pressure_head)
-            # track_memory("After err calcul")
-            #debug.print("Error: {}", err)
-            # Clear caches as in original code
+            # Clear caches 
             jax.clear_caches()
             return pressure_head, pressure_head_n, err, iter_count + 1
 
@@ -177,7 +164,6 @@ class RichardsSolver:
         initial_carry = (pressure_head_n, pressure_head_n, jnp.inf, 0)
         final_carry = jax.lax.while_loop(cond_fun, body_fun, initial_carry)
         pressure_head, _, err, iter_count = final_carry
-        # track_memory("After loop")
         jax.clear_caches()
         return pressure_head, err, iter_count
     
@@ -321,16 +307,16 @@ class RichardsSolver:
             
             
             # Calculate water content
-            # _, _, theta = vmap(exponential_model, in_axes=(0, None))(
-            #     pressure_head, self.config.exponential.to_array())
+            _, _, theta = vmap(exponential_model, in_axes=(0, None))(
+                pressure_head, self.config.exponential.to_array())
             
             # Store results
-            # all_pressure.append(pressure_head)
-            # all_theta.append(theta)
-            # all_times.append(current_time)
-            # all_iterations.append(int(iter_count))  # Convert to int
-            # all_errors.append(float(error))         # Convert to float
-            # all_dt.append(dt_new)                   # Already float
+            all_pressure.append(pressure_head)
+            all_theta.append(theta)
+            all_times.append(current_time)
+            all_iterations.append(int(iter_count))  # Convert to int
+            all_errors.append(float(error))         # Convert to float
+            all_dt.append(dt_new)                   # Already float
             
             # Update for next time step
             pressure_head_n = pressure_head

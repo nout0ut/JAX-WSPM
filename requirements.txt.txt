@@ -1,0 +1,23 @@
+# JAX for GPU-accelerated computations.
+jax==0.4.13
+
+# JAXlib with CUDA support. Adjust the "+cuda12.cudnn86" if your system uses a different CUDA version.
+jaxlib==0.4.13+cuda12.cudnn86
+
+# Colorama for colored terminal output.
+colorama==0.4.6
+
+# PyFiglet for ASCII art banners.
+pyfiglet==0.8.post1
+
+# Tqdm for progress bars.
+tqdm==4.64.1
+
+# psutil for system monitoring.
+psutil==5.9.5
+
+# Matplotlib for plotting.
+matplotlib>=3.7.0
+
+# NumPy for numerical operations.
+numpy>=1.21

@@ -1,4 +1,4 @@
-# src/numerics/assembly_re.py
+# src/numerics/assembly_re_v2.py
 """
 Matrix assembly utilities for the finite element implementation.
 """

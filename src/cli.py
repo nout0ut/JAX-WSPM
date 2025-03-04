@@ -36,15 +36,13 @@ from config.welcome_banner import (
     print_fancy_banner
 )
 
-# At the top of your file, after imports
 
 jax.config.update('jax_enable_x64', False)
-# jax.config.update('jax_disable_jit', True)
+# jax.config.update('jax_disable_jit', True) #To disable jit
 
 
 
 
-# src/cli.py modifications
 
 def parse_args():
     """Parse command line arguments."""

@@ -184,7 +184,6 @@ class RichardsSolver3D:
         # track_memory("Start of solve_timestep")
         
         while err >= 1e-4 and iter_count < 30:
-            # track_memory(f"Start of iteration {iter_count}")
             
             # Calculate soil properties
             Capacity_m, Konduc_m, thetan_m = vmap(exponential_model, in_axes=(0, None))(
@@ -196,7 +195,6 @@ class RichardsSolver3D:
                 thetan_m, thetan_0, pressure_head_m,
                 Konduc_m, Capacity_m, self.quad_points, self.weights, dt
             )
-            # track_memory(f"After matrix assembly - iter {iter_count}")
             
             # Apply all boundary conditions directly on sparse matrix
             Global_matrix, Global_source = apply_all_bcs_sparse(
@@ -205,7 +203,6 @@ class RichardsSolver3D:
                 self.boundary_nodes,
                 self.hupper
             )
-            # track_memory(f"After applying BCs - iter {iter_count}")
             
             # Solve system
             pressure_head, convergence = solve_system(
@@ -214,7 +211,6 @@ class RichardsSolver3D:
                 x0=pressure_head_m,
                 solver_config=self.config.solver
             )
-            # track_memory(f"After solving linear system - iter {iter_count}")
             
             # Calculate error and update variables
             err = jnp.linalg.norm(pressure_head - pressure_head_m)
@@ -222,7 +218,6 @@ class RichardsSolver3D:
             iter_count += 1
             
             jax.clear_caches()
-            # track_memory(f"End of iteration {iter_count}")
         
         return pressure_head, err, iter_count
         
@@ -251,7 +246,6 @@ class RichardsSolver3D:
         
         # Time stepping loop
         while current_time < self.config.time.Tmax:
-            # track_memory("befor time step")
             _, _, thetan_0 = vmap(exponential_model, in_axes=(0, None))(
                 pressure_head_n, self.config.exponential.to_array())
             
