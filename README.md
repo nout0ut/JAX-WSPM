@@ -118,10 +118,20 @@ done
    ```
 ## Install Dependencies
 
+### For Local Environments 
+
 It is recommended to create a virtual environment before installing the project dependencies. Run the following commands:
 
 ```bash
 python -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
-pip install -r requirements.txt             
-```        
+pip install -r requirements.txt 
+```
+### For Alliance Canada Clusters (e.g., Narval, Graham, or Alice)
+
+On these clusters, the necessary CUDA and Python environments are typically pre-configured. In that case, simply load the required modules:
+
+```bash
+module load cuda/12.6
+module load python/3.12.4
+```
