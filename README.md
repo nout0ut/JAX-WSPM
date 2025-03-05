@@ -138,3 +138,4 @@ module load python/3.12.4
 ## Water Content Distribution Movie
 
 [Watch the Water Content Distribution Movie](config/theta_movie.mp4)
+![Water Content Distribution Movie](config/theta_movie.gif)
