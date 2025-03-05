@@ -135,3 +135,6 @@ On these clusters, the necessary CUDA and Python environments are typically pre-
 module load cuda/12.6
 module load python/3.12.4
 ```
+## Water Content Distribution Movie
+
+[Watch the Water Content Distribution Movie](config/theta_movie.mp4)
