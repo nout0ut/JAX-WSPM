@@ -139,7 +139,7 @@ module load python/3.12.4
 ```
 ## Water Content and Solute concentration Distributions (Example 2)
 
-<img src="resultsSolute/final_state.png" alt="Library Logo" width="400" />
+<img src="resultsSolute/final_state.png" alt="Library Logo" width="800" />
 
 ## Water Content Distribution Movie (Example 3)
 
