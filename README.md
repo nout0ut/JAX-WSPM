@@ -17,7 +17,7 @@ Benchmark tests are conducted to examine the accuracy, efficiency, and scalabili
 
 **Authors:**
 
-- Nour-eddine Toutlini  
+- Nour-Eddine Toutlini  
 - Azzeddine Soulaïmani  
 - Abdelaziz Beljadid  
 
