@@ -56,8 +56,7 @@ python -m src.cli --test-case SoluteTest --solver gmres --preconditioner none --
 
 ## Running Jobs with SLURM
 
-For batch processing on high-performance computing clusters, you can use the provided SLURM job script (`job.sh`). Below is an example script for running Test 1, Test 2, and Test 3:
-
+For batch processing on high-performance computing clusters, you can use the provided SLURM job script (`job.sh`). Below is an example script for running Test 1, Test 2, and Test 3 from the paper using different meshes, solvers, and preconditioners. The results will be saved in `.npz` files, and performance metrics such as L2 error, wall time, and others will be recorded in `.csv` files:
 ```bash
 #!/bin/bash
 #SBATCH --job-name=richards_benchmark
