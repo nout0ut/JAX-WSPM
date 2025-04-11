@@ -102,7 +102,7 @@ print(f"{os.environ[\"TEST_CASE\"]},{os.environ[\"MESH\"]},{os.environ[\"SOLVER\
      f"{float(data[\"linf_saturation\"]):.4e},"
      f"{float(data[\"l2_relative_pressure\"]):.4e},"
      f"{float(data[\"l2_relative_saturation\"]):.4e},"
-     f"{float(data[\"memory_usage\"]):.2f}")' >> results/benchmark_results_cpu_200.csv
+     f"{float(data[\"memory_usage\"]):.2f}")' >> results/benchmark_results.csv
            done
        done
    done
