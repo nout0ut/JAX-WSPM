@@ -140,7 +140,7 @@ module load python/3.12.4
 <img src="resultsSolute/final_state.png" alt="Library Logo" width="1000" />
 
 ## Water Content Distribution Movie (Example 3)
-[Watch the Water Content Distribution Movie](config/theta_movie.mp4)
+You can click here: [Watch the Water Content Distribution Movie](config/theta_movie.mp4)
 
 
 ![Water Content Distribution Movie](config/theta_movie.gif)
