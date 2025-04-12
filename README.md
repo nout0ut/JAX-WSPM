@@ -53,6 +53,21 @@ JAX-WSPM offers a streamlined command-line interface implemented in `src/cli.py`
 ```bash
 python -m src.cli --test-case SoluteTest --solver gmres --preconditioner none --output-dir Soluteresults --mesh-size 1024 --dt 1e-4 --tmax 1
 ```
+**Note:**  
+All the numerical tests presented in the paper can be executed using the streamlined command-line interface by specifying the appropriate test case with the `--test-case` parameter. Use the following test cases for the respective examples:
+
+- **Example 1:**
+  - For Test 1: `--test-case Test1`
+  - For Test 2: `--test-case Test2`
+  - For Test 3: `--test-case Test3`
+
+- **Example 2:**
+  - Use: `--test-case SoluteTest`
+
+- **Example 3:**
+  - Use: `--test-case Test3D`
+
+
 
 ## Running Jobs with SLURM
 
