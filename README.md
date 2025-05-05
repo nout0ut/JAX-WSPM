@@ -33,7 +33,8 @@ Benchmark tests are conducted to examine the accuracy, efficiency, and scalabili
   title={JAX-WSPM: A GPU-accelerated parallel framework using the JAX library for modeling water flow and solute transport in unsaturated porous media using an implicit finite element method},
   author={Toutlini, N-E. and Soulaïmani, A. and Beljadid, A.},
   journal={Computer Physics Communications},
-  year={2025}
+  year={2025},
+  note={Under review}
 }
 ```
 ## Numerical Tests
